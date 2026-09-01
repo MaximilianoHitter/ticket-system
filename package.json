@@ -1,0 +1,14 @@
+{
+  "name": "ticket-system",
+  "private": true,
+  "author": {
+    "name": "Maximiliano Hitter",
+    "email": "maximilianohitter@gmail.com"
+  },
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm -r build"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

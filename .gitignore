@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Builds
+dist/
+build/
+**/dist/
+**/build/
+apps/frontend/dist/
+apps/backend/dist/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+**/coverage/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Prisma (si lo usás luego, no molesta dejarlo ya)
+apps/backend/prisma/*.db
+
+# Docker
+docker-compose.override.yml
