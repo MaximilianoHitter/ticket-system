@@ -5,9 +5,10 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "prettier": "@ticketapp/prettier-config",
   "scripts": {
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.ts\"",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
