@@ -9,7 +9,7 @@
     "dev:backend": "pnpm --filter backend start:dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm -r build",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "packageManager": "pnpm@9.0.0",
   "pnpm": {
