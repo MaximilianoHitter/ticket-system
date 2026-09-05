@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'GESTOR', 'CLIENTE');
+CREATE TYPE "RoleModel" AS ENUM ('ADMIN', 'GESTOR', 'CLIENTE');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -7,7 +7,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'CLIENTE',
+    "role" "RoleModel" NOT NULL DEFAULT 'CLIENTE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
