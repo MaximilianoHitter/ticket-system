@@ -1,7 +1,15 @@
-POST http://localhost/api/auth/login
+@email_admin = pepe@pepe.com
+@pass_admin = password123
+@token_admin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZGIwMDkyNi03YWQ5LTQ0NzktOGNiMC04N2RlYmVjMTQwYjciLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODg2MzAxOTUsImV4cCI6MTc4ODcxNjU5NX0.rhZA3572omWZNgo0_Ch97HNydWplDiPrAZu018tNUvw
+@url = http://localhost:3000
+
+POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-    "email":"pepe@pepe.com",
-    "password":"password123"
+    "email":"{{email_admin}}",
+    "password":"{{pass_admin}}"
 }
+
+GET {{url}}/users
+Authorization: Bearer {{token_admin}}
