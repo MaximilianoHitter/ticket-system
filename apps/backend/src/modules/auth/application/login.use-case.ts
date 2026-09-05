@@ -4,13 +4,10 @@ import {
   USER_REPOSITORY,
   UserRepositoryInterface,
 } from 'src/modules/users/domain/interfaces/user-repository.interface';
-import {
-  HASHING_SERVICE,
-  HashingServiceInterface,
-} from 'src/shared/hashing/domain/hashing.interface';
-import { TOKEN_SERVICE, TokenServiceInterface } from 'src/shared/token/domain/token.interface';
 import { InvalidCredentialsError } from '../domain/exceptions/invalid-credentials.error';
-import { LOGGER_SERVICE, LoggerServiceInterface } from 'src/shared/logger/domain/logger.interface';
+import { LOGGER_SERVICE, LoggerServiceInterface } from '@shared/logger/domain/logger.interface';
+import { HASHING_SERVICE, HashingServiceInterface } from '@shared/hashing/domain/hashing.interface';
+import { TOKEN_SERVICE, TokenServiceInterface } from '@shared/token/domain/token.interface';
 
 export interface LoginInput {
   email: string;
