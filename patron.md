@@ -1,0 +1,36 @@
+- auth
+  - domain
+    - entities
+      - user
+    - interfaces
+      - user repository
+    - exceptions
+      - invalid credentials error
+  - application
+    - login use case
+  - infrastructure
+    - auth module
+    - auth controller
+    - dto
+      - request
+        - login dto
+      - response
+        - login response
+        - user response
+
+- shared
+  - hashing
+    - domain
+      - hashing.interface.ts
+    - infrastructure
+      - bcrypt-hashing.service.ts
+      - hashing.module.ts
+  - token
+    - domain
+      - token.interface.ts
+    - infrastructure
+      - jwt-token.service.ts
+      - token.module.ts
+  - prisma
+    - prisma.service.ts
+    - prisma.module.ts
