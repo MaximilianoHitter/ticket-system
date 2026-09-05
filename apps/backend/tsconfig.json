@@ -19,7 +19,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@prisma-client": ["src/generated/prisma/client"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@modules/*": ["src/modules/*"]
     }
   }
 }
