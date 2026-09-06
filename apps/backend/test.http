@@ -1,7 +1,9 @@
 @email_admin = pepe@pepe.com
 @pass_admin = password123
-@token_admin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZGIwMDkyNi03YWQ5LTQ0NzktOGNiMC04N2RlYmVjMTQwYjciLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODg2MzAxOTUsImV4cCI6MTc4ODcxNjU5NX0.rhZA3572omWZNgo0_Ch97HNydWplDiPrAZu018tNUvw
+@token_admin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZGIwMDkyNi03YWQ5LTQ0NzktOGNiMC04N2RlYmVjMTQwYjciLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODg2NTc4NTAsImV4cCI6MTc4ODc0NDI1MH0.TKcta6UfMCjAfAj8fLpoWhuGTwu6l7osZdsaePF1-Lw
 @url = http://localhost:3000
+@email_user = juan@juan.com
+@pass_user = password123
 
 POST {{url}}/auth/login
 Content-Type: application/json
@@ -11,5 +13,13 @@ Content-Type: application/json
     "password":"{{pass_admin}}"
 }
 
-GET {{url}}/users
+POST {{url}}/users/
 Authorization: Bearer {{token_admin}}
+Content-Type: application/json
+
+{
+    "email":"{{email_user}}",
+    "password":"{{pass_user}}",
+    "name": "Juan",
+    "role": "CLIENTE"
+}

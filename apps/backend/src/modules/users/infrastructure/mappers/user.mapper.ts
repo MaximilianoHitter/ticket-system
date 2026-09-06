@@ -8,7 +8,9 @@ export class UserMapper {
       prismaUser.id,
       prismaUser.email,
       prismaUser.password,
+      prismaUser.name,
       RoleMapper.toDomain(prismaUser.role),
+      prismaUser.deletedAt,
     );
   }
 }

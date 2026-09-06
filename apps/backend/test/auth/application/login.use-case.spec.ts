@@ -58,7 +58,7 @@ describe('LoginUseCase', () => {
   });
 
   it('debería lanzar InvalidCredentialsError si la contraseña no coincide', async () => {
-    const fakeUser = new User('id-1', 'user@test.com', 'hashed-pass', Role.CLIENTE);
+    const fakeUser = new User('id-1', 'user@test.com', 'pepe', 'hashed-pass', Role.CLIENTE);
     userRepository.findByEmail.mockResolvedValue(fakeUser);
     hashingService.compare.mockResolvedValue(false);
 
@@ -68,7 +68,7 @@ describe('LoginUseCase', () => {
   });
 
   it('debería devolver token y usuario si las credenciales son correctas', async () => {
-    const fakeUser = new User('id-1', 'user@test.com', 'hashed-pass', Role.CLIENTE);
+    const fakeUser = new User('id-1', 'user@test.com', 'pepe', 'hashed-pass', Role.CLIENTE);
     userRepository.findByEmail.mockResolvedValue(fakeUser);
     hashingService.compare.mockResolvedValue(true);
     tokenService.generate.mockReturnValue('fake-jwt-token');
