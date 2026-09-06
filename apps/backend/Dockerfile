@@ -11,7 +11,6 @@ WORKDIR /app
 # Deps: instala dependencias del workspace
 ################################
 FROM base AS deps
-# Copiamos solo lo necesario para resolver dependencias (mejor cache de Docker)
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY apps/backend/package.json ./apps/backend/package.json
 COPY packages/shared-types/package.json ./packages/shared-types/package.json
@@ -19,7 +18,7 @@ COPY packages/shared-types/package.json ./packages/shared-types/package.json
 RUN pnpm install --frozen-lockfile --filter backend...
 
 ################################
-# Build: compila el backend
+# Build: genera cliente Prisma + compila el backend
 ################################
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
@@ -29,6 +28,9 @@ COPY --from=deps /app/packages/shared-types/node_modules ./packages/shared-types
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY apps/backend ./apps/backend
 COPY packages/shared-types ./packages/shared-types
+
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+RUN pnpm --filter backend exec prisma generate
 
 RUN pnpm --filter backend... build
 
@@ -42,10 +44,10 @@ COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY apps/backend/package.json ./apps/backend/package.json
 COPY packages/shared-types/package.json ./packages/shared-types/package.json
 
-# Solo dependencias de producción
 RUN pnpm install --frozen-lockfile --prod --filter backend...
 
 COPY --from=build /app/apps/backend/dist ./apps/backend/dist
+COPY --from=build /app/apps/backend/src/generated ./apps/backend/dist/generated
 COPY --from=build /app/packages/shared-types/dist ./packages/shared-types/dist
 
 WORKDIR /app/apps/backend
