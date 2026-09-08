@@ -1,6 +1,6 @@
 @email_admin = pepe@pepe.com
 @pass_admin = password123
-@token_admin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZGIwMDkyNi03YWQ5LTQ0NzktOGNiMC04N2RlYmVjMTQwYjciLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODg2NTkwMzYsImV4cCI6MTc4ODc0NTQzNn0.hySlE1Q3__b4ZkEYDIjlno3TuWAtz4W3k1_sX1IIfE0
+@token_admin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZGIwMDkyNi03YWQ5LTQ0NzktOGNiMC04N2RlYmVjMTQwYjciLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODg5MDk1NTQsImV4cCI6MTc4ODk5NTk1NH0.8NUSDe8ptxTUfrvaowVf6mprS2Dztr_D2f6MYUgfIbo
 @url = http://localhost:3000
 @email_user = juan@juan.com
 @pass_user = password123
@@ -23,3 +23,7 @@ Content-Type: application/json
     "name": "Pablo",
     "role": "CLIENTE"
 }
+
+GET {{url}}/users?role=CLIENTE&email=an
+Authorization: Bearer {{token_admin}}
+Content-Type: application/json

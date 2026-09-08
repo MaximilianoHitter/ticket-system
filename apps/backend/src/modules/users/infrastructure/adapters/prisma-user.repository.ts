@@ -4,6 +4,7 @@ import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { User } from '../../domain/entities/user.entity';
 import { UserMapper } from '../mappers/user.mapper';
 import { RoleMapper } from '../mappers/role.mapper';
+import { Role } from '@ticketapp/shared-types';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepositoryInterface {
@@ -30,5 +31,32 @@ export class PrismaUserRepository implements UserRepositoryInterface {
       },
     });
     return UserMapper.toDomain(record);
+  }
+
+  async findAll(
+    skip: number,
+    take: number,
+    role?: Role,
+    email?: string,
+  ): Promise<{ users: User[]; total: number }> {
+    const where = {
+      deletedAt: null,
+      ...(role ? { role: RoleMapper.toPersistence(role) } : {}),
+      ...(email ? { email: { contains: email, mode: 'insensitive' as const } } : {}),
+    };
+    const [records, total] = await this.prisma.$transaction([
+      this.prisma.userModel.findMany({
+        where,
+        skip,
+        take,
+      }),
+      this.prisma.userModel.count({
+        where,
+      }),
+    ]);
+    return {
+      users: records.map(UserMapper.toDomain),
+      total,
+    };
   }
 }
