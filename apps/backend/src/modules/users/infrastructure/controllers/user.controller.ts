@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -33,6 +34,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetUserByIdUseCase } from '@modules/users/application/get-user-by-id.use-case';
+import { CurrentUser } from '@shared/security/infrastructure/current-user.decorator';
+import { TokenPayload } from '@shared/token/domain/token.interface';
+import { GetMeUseCase } from '@modules/users/application/get-me.use-case';
+import { EditUserRequestDto } from '../dto/request/edit-user.request.dto';
+import { EditUserUseCase } from '@modules/users/application/edit-user.use-case';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -43,6 +49,8 @@ export class UsersController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly getMeUseCase: GetMeUseCase,
+    private readonly editUserUseCase: EditUserUseCase,
   ) {}
 
   @Post('/')
@@ -75,6 +83,15 @@ export class UsersController {
     return new PaginatedResponseDto(usersDto, output.total, dto.page, dto.limit);
   }
 
+  @Get('/me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Obtener el mismo usuario' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async getMe(@CurrentUser() currentUser: TokenPayload): Promise<UserResponseDto> {
+    const output = await this.getMeUseCase.execute({ user: currentUser });
+    return UserResponseDto.fromEntity(output.user);
+  }
+
   @Get('/:id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
@@ -91,6 +108,33 @@ export class UsersController {
     id: string,
   ): Promise<UserResponseDto> {
     const output = await this.getUserByIdUseCase.execute({ id: id });
+    return UserResponseDto.fromEntity(output.user);
+  }
+
+  @Patch('/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Edición de un usuario' })
+  @ApiBody({ type: () => EditUserRequestDto })
+  @ApiResponse({ type: () => UserResponseDto })
+  async edit(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+    @CurrentUser() currentUser: TokenPayload,
+    @Body() dto: EditUserRequestDto,
+  ) {
+    const output = await this.editUserUseCase.execute({
+      targetUserId: id,
+      requestingUser: currentUser,
+      name: dto.name,
+      password: dto.password,
+      role: dto.role,
+    });
     return UserResponseDto.fromEntity(output.user);
   }
 }
