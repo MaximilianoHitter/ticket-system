@@ -30,7 +30,40 @@ model UserModel {
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
+  projectMemberships ProjectMemberModel[]
+  createdProjects    ProjectModel[]       @relation("ProjectCreator")
+
   @@index([email])
   @@index([role])
   @@map("users")
+}
+
+model ProjectModel {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  creator UserModel            @relation("ProjectCreator", fields: [createdBy], references: [id])
+  members ProjectMemberModel[]
+
+  @@index([createdBy])
+  @@map("projects")
+}
+
+model ProjectMemberModel {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  project ProjectModel @relation(fields: [projectId], references: [id])
+  user    UserModel    @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_members")
 }
