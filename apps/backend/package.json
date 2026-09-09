@@ -27,6 +27,7 @@
     "@nestjs/jwt": "^12.0.1",
     "@nestjs/passport": "^12.0.0",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11",
     "@prisma/client": "6",
     "@ticketapp/shared-types": "workspace:^",
     "bcrypt": "^6.0.0",
