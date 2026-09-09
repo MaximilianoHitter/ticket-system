@@ -10,9 +10,10 @@ import { GetUserByIdUseCase } from '../application/get-user-by-id.use-case';
 import { GetMeUseCase } from '../application/get-me.use-case';
 import { EditUserUseCase } from '../application/edit-user.use-case';
 import { DeactivateUserUseCase } from '../application/deactivate-user.use-case';
+import { IdGeneratorModule } from '@shared/id-generator/infrastructure/id-generator.module';
 
 @Module({
-  imports: [SecurityModule, HashingModule],
+  imports: [SecurityModule, HashingModule, IdGeneratorModule],
   providers: [
     CreateUserUseCase,
     ListUsersUseCase,

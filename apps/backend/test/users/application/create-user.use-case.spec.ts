@@ -9,12 +9,17 @@ import { LOGGER_SERVICE, LoggerServiceInterface } from '@shared/logger/domain/lo
 import { UserAlreadyExistsError } from '@modules/users/domain/exceptions/user-already-exists.error';
 import { User } from '@modules/users/domain/entities/user.entity';
 import { Role } from '@ticketapp/shared-types';
+import {
+  ID_GENERATOR_SERVICE,
+  IdGeneratorServiceInterface,
+} from '@shared/id-generator/domain/id-generator.inteface';
 
 describe('CreateUserUseCase', () => {
   let useCase: CreateUserUseCase;
   let userRepository: jest.Mocked<UserRepositoryInterface>;
   let hashingService: jest.Mocked<HashingServiceInterface>;
   let logger: jest.Mocked<LoggerServiceInterface>;
+  let idGeneratorService: jest.Mocked<IdGeneratorServiceInterface>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,6 +37,10 @@ describe('CreateUserUseCase', () => {
           provide: LOGGER_SERVICE,
           useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() },
         },
+        {
+          provide: ID_GENERATOR_SERVICE,
+          useValue: { generate: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -39,6 +48,7 @@ describe('CreateUserUseCase', () => {
     userRepository = module.get(USER_REPOSITORY);
     hashingService = module.get(HASHING_SERVICE);
     logger = module.get(LOGGER_SERVICE);
+    idGeneratorService = module.get(ID_GENERATOR_SERVICE);
   });
 
   it('debería crear el usuario correctamente si el email no existe', async () => {
@@ -53,7 +63,7 @@ describe('CreateUserUseCase', () => {
       Role.CLIENTE,
     );
     userRepository.save.mockResolvedValue(savedUser);
-
+    idGeneratorService.generate.mockReturnValue('generated-id');
     const result = await useCase.execute({
       email: 'new@test.com',
       password: 'plain-password',
