@@ -1,10 +1,13 @@
 import { CreateUserUseCase } from '@modules/users/application/create-user.use-case';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
@@ -26,10 +29,10 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { GetUserByIdUseCase } from '@modules/users/application/get-user-by-id.use-case';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -39,6 +42,7 @@ export class UsersController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
   ) {}
 
   @Post('/')
@@ -67,9 +71,26 @@ export class UsersController {
       role: dto.role,
       email: dto.email,
     });
-
     const usersDto = output.users.map((user) => UserResponseDto.fromEntity(user));
-
     return new PaginatedResponseDto(usersDto, output.total, dto.page, dto.limit);
+  }
+
+  @Get('/:id')
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Obtener un usuario por id' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async getById(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+  ): Promise<UserResponseDto> {
+    const output = await this.getUserByIdUseCase.execute({ id: id });
+    return UserResponseDto.fromEntity(output.user);
   }
 }
