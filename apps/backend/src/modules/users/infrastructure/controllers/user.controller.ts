@@ -1,10 +1,15 @@
 import { CreateUserUseCase } from '@modules/users/application/create-user.use-case';
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -26,10 +31,16 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { GetUserByIdUseCase } from '@modules/users/application/get-user-by-id.use-case';
+import { CurrentUser } from '@shared/security/infrastructure/current-user.decorator';
+import { TokenPayload } from '@shared/token/domain/token.interface';
+import { GetMeUseCase } from '@modules/users/application/get-me.use-case';
+import { EditUserRequestDto } from '../dto/request/edit-user.request.dto';
+import { EditUserUseCase } from '@modules/users/application/edit-user.use-case';
+import { DeactivateUserUseCase } from '@modules/users/application/deactivate-user.use-case';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -39,6 +50,10 @@ export class UsersController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly getMeUseCase: GetMeUseCase,
+    private readonly editUserUseCase: EditUserUseCase,
+    private readonly deactivateUserUseCase: DeactivateUserUseCase,
   ) {}
 
   @Post('/')
@@ -67,9 +82,85 @@ export class UsersController {
       role: dto.role,
       email: dto.email,
     });
-
     const usersDto = output.users.map((user) => UserResponseDto.fromEntity(user));
-
     return new PaginatedResponseDto(usersDto, output.total, dto.page, dto.limit);
+  }
+
+  @Get('/me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Obtener el mismo usuario' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async getMe(@CurrentUser() currentUser: TokenPayload): Promise<UserResponseDto> {
+    const output = await this.getMeUseCase.execute({ user: currentUser });
+    return UserResponseDto.fromEntity(output.user);
+  }
+
+  @Get('/:id')
+  @Roles(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Obtener un usuario por id' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async getById(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+  ): Promise<UserResponseDto> {
+    const output = await this.getUserByIdUseCase.execute({ id: id });
+    return UserResponseDto.fromEntity(output.user);
+  }
+
+  @Patch('/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Edición de un usuario' })
+  @ApiBody({ type: () => EditUserRequestDto })
+  @ApiResponse({ type: () => UserResponseDto })
+  async edit(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+    @CurrentUser() currentUser: TokenPayload,
+    @Body() dto: EditUserRequestDto,
+  ) {
+    const output = await this.editUserUseCase.execute({
+      targetUserId: id,
+      requestingUser: currentUser,
+      name: dto.name,
+      password: dto.password,
+      role: dto.role,
+    });
+    return UserResponseDto.fromEntity(output.user);
+  }
+
+  @Delete('/:id')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Desactivar un usuario' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async deactivate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+    @CurrentUser() currentUser: TokenPayload,
+  ) {
+    const output = await this.deactivateUserUseCase.execute({
+      requestingUser: currentUser,
+      targetUserId: id,
+    });
+    return UserResponseDto.fromOutput(output);
   }
 }

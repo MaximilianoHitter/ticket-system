@@ -6,12 +6,20 @@ import { SecurityModule } from '@shared/security/infrastructure/security.module'
 import { CreateUserUseCase } from '../application/create-user.use-case';
 import { HashingModule } from '@shared/hashing/infrastructure/hashing.module';
 import { ListUsersUseCase } from '../application/list-users.use-case';
+import { GetUserByIdUseCase } from '../application/get-user-by-id.use-case';
+import { GetMeUseCase } from '../application/get-me.use-case';
+import { EditUserUseCase } from '../application/edit-user.use-case';
+import { DeactivateUserUseCase } from '../application/deactivate-user.use-case';
 
 @Module({
   imports: [SecurityModule, HashingModule],
   providers: [
     CreateUserUseCase,
     ListUsersUseCase,
+    GetUserByIdUseCase,
+    GetMeUseCase,
+    EditUserUseCase,
+    DeactivateUserUseCase,
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,
