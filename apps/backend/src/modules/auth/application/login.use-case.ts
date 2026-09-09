@@ -38,10 +38,7 @@ export class LoginUseCase {
       const user = await this.userRepository.findByEmail(input.email);
       if (!user) throw new InvalidCredentialsError();
 
-      const isPasswordValid = await this.hashingService.compare(
-        input.password,
-        user.getPasswordHash(),
-      );
+      const isPasswordValid = await this.hashingService.compare(input.password, user.getPassword());
 
       if (!isPasswordValid) throw new InvalidCredentialsError();
 

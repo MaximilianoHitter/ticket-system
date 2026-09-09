@@ -27,7 +27,7 @@
     "apps/backend/**/*.{ts,js}": [
       "pnpm --filter backend exec eslint --fix",
       "pnpm --filter backend exec prettier --write",
-      "pnpm --filter backend exec jest --bail --findRelatedTests"
+      "pnpm --filter backend exec jest --bail --findRelatedTests --passWithNoTests"
     ],
     "apps/frontend/**/*.{ts,tsx,js,jsx}": [
       "pnpm --filter frontend exec eslint --fix",
