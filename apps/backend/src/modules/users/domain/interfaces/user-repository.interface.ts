@@ -21,4 +21,5 @@ export interface UserRepositoryInterface {
     email?: string,
   ): Promise<{ users: User[]; total: number }>;
   update(id: string, data: UpdateUserData): Promise<User>;
+  deactivate(id: string): Promise<User>;
 }

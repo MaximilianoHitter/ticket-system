@@ -9,6 +9,7 @@ import { ListUsersUseCase } from '../application/list-users.use-case';
 import { GetUserByIdUseCase } from '../application/get-user-by-id.use-case';
 import { GetMeUseCase } from '../application/get-me.use-case';
 import { EditUserUseCase } from '../application/edit-user.use-case';
+import { DeactivateUserUseCase } from '../application/deactivate-user.use-case';
 
 @Module({
   imports: [SecurityModule, HashingModule],
@@ -18,6 +19,7 @@ import { EditUserUseCase } from '../application/edit-user.use-case';
     GetUserByIdUseCase,
     GetMeUseCase,
     EditUserUseCase,
+    DeactivateUserUseCase,
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,

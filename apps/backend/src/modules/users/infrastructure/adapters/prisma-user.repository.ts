@@ -75,4 +75,12 @@ export class PrismaUserRepository implements UserRepositoryInterface {
     });
     return UserMapper.toDomain(record);
   }
+
+  async deactivate(id: string): Promise<User> {
+    const record = await this.prisma.userModel.update({
+      where: { id: id },
+      data: { deletedAt: new Date() },
+    });
+    return UserMapper.toDomain(record);
+  }
 }

@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -39,6 +40,7 @@ import { TokenPayload } from '@shared/token/domain/token.interface';
 import { GetMeUseCase } from '@modules/users/application/get-me.use-case';
 import { EditUserRequestDto } from '../dto/request/edit-user.request.dto';
 import { EditUserUseCase } from '@modules/users/application/edit-user.use-case';
+import { DeactivateUserUseCase } from '@modules/users/application/deactivate-user.use-case';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -51,6 +53,7 @@ export class UsersController {
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
     private readonly getMeUseCase: GetMeUseCase,
     private readonly editUserUseCase: EditUserUseCase,
+    private readonly deactivateUserUseCase: DeactivateUserUseCase,
   ) {}
 
   @Post('/')
@@ -136,5 +139,28 @@ export class UsersController {
       role: dto.role,
     });
     return UserResponseDto.fromEntity(output.user);
+  }
+
+  @Delete('/:id')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Desactivar un usuario' })
+  @ApiResponse({ type: () => UserResponseDto })
+  async deactivate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
+      }),
+    )
+    id: string,
+    @CurrentUser() currentUser: TokenPayload,
+  ) {
+    const output = await this.deactivateUserUseCase.execute({
+      requestingUser: currentUser,
+      targetUserId: id,
+    });
+    return UserResponseDto.fromOutput(output);
   }
 }
