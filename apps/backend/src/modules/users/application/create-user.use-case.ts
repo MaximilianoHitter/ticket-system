@@ -8,7 +8,10 @@ import {
 import { HASHING_SERVICE, HashingServiceInterface } from '@shared/hashing/domain/hashing.interface';
 import { LOGGER_SERVICE, LoggerServiceInterface } from '@shared/logger/domain/logger.interface';
 import { UserAlreadyExistsError } from '../domain/exceptions/user-already-exists.error';
-import { randomUUID } from 'crypto';
+import {
+  ID_GENERATOR_SERVICE,
+  IdGeneratorServiceInterface,
+} from '@shared/id-generator/domain/id-generator.inteface';
 
 export interface CreateUserInput {
   email: string;
@@ -32,6 +35,8 @@ export class CreateUserUseCase {
     private readonly hashingService: HashingServiceInterface,
     @Inject(LOGGER_SERVICE)
     private readonly logger: LoggerServiceInterface,
+    @Inject(ID_GENERATOR_SERVICE)
+    private readonly idGeneratorService: IdGeneratorServiceInterface,
   ) {}
 
   async execute(input: CreateUserInput): Promise<CreateUserOutput> {
@@ -41,7 +46,13 @@ export class CreateUserUseCase {
 
       const passwordHash = await this.hashingService.hash(input.password);
 
-      const newUser = new User(randomUUID(), input.email, passwordHash, input.name, input.role);
+      const newUser = new User(
+        this.idGeneratorService.generate(),
+        input.email,
+        passwordHash,
+        input.name,
+        input.role,
+      );
 
       const savedUser = await this.userRepository.save(newUser);
 
