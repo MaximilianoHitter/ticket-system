@@ -32,6 +32,10 @@ model UserModel {
 
   projectMemberships ProjectMemberModel[]
   createdProjects    ProjectModel[]       @relation("ProjectCreator")
+  createdTickets      TicketModel[]        @relation("TicketCreator")
+  assignedTickets     TicketModel[]        @relation("TicketAssignee")
+  ticketComments      TicketCommentModel[]
+  ticketHistoryChanges TicketHistoryModel[]
 
   @@index([email])
   @@index([role])
@@ -49,6 +53,7 @@ model ProjectModel {
 
   creator UserModel            @relation("ProjectCreator", fields: [createdBy], references: [id])
   members ProjectMemberModel[]
+  tickets TicketModel[]
 
   @@index([createdBy])
   @@map("projects")
@@ -66,4 +71,67 @@ model ProjectMemberModel {
   @@unique([projectId, userId])
   @@index([userId])
   @@map("project_members")
+}
+
+enum TicketStatusModel {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  BLOCKED
+  CLOSED
+}
+
+model TicketModel {
+  id          String            @id @default(uuid())
+  title       String
+  description String
+  status      TicketStatusModel @default(OPEN)
+  projectId   String
+  createdBy   String
+  assignedTo  String?
+  createdAt   DateTime          @default(now())
+  assignedAt  DateTime?
+  resolvedAt  DateTime?
+  updatedAt   DateTime          @updatedAt
+
+  project  ProjectModel          @relation(fields: [projectId], references: [id])
+  creator  UserModel             @relation("TicketCreator", fields: [createdBy], references: [id])
+  assignee UserModel?            @relation("TicketAssignee", fields: [assignedTo], references: [id])
+  comments TicketCommentModel[]
+  history  TicketHistoryModel[]
+
+  @@index([projectId])
+  @@index([createdBy])
+  @@index([assignedTo])
+  @@index([status])
+  @@map("tickets")
+}
+
+model TicketCommentModel {
+  id        String   @id @default(uuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket TicketModel @relation(fields: [ticketId], references: [id])
+  author UserModel   @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId])
+  @@map("ticket_comments")
+}
+
+model TicketHistoryModel {
+  id           String   @id @default(uuid())
+  ticketId     String
+  changedBy    String
+  previousData Json
+  newData      Json
+  changedAt    DateTime @default(now())
+
+  ticket TicketModel @relation(fields: [ticketId], references: [id])
+  user   UserModel   @relation(fields: [changedBy], references: [id])
+
+  @@index([ticketId])
+  @@map("ticket_history")
 }
