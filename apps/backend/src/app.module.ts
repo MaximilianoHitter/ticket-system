@@ -5,8 +5,17 @@ import { LoggerModule } from './shared/logger/infrastructure/logger.module';
 import { UsersModule } from '@modules/users/infrastructure/users.module';
 import { IdGeneratorModule } from '@shared/id-generator/infrastructure/id-generator.module';
 import { ProjectsModule } from '@modules/projects/infrastructure/projects.module';
+import { TicketsModule } from '@modules/tickets/infrastructure/tickets.module';
 
 @Module({
-  imports: [PrismaModule, LoggerModule, IdGeneratorModule, AuthModule, UsersModule, ProjectsModule],
+  imports: [
+    PrismaModule,
+    LoggerModule,
+    IdGeneratorModule,
+    AuthModule,
+    UsersModule,
+    ProjectsModule,
+    TicketsModule,
+  ],
 })
 export class AppModule {}
