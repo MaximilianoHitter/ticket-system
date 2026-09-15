@@ -12,6 +12,8 @@ import { AssignMemberToProjectUseCase } from '../application/assign-member-to-pr
 import { PROJECT_MEMBER_REPOSITORY } from '../domain/interfaces/project-member-repository.interface';
 import { PrismaProjectMemberRepository } from './adapters/prisma-project-member.repository';
 import { RemoveMemberFromProjectUseCase } from '../application/remove-member-from-project.use-case';
+import { ListProjectsUseCase } from '../application/list-projects.use-case';
+import { GetProjectByIdUseCase } from '../application/get-project-by-id.use-case';
 
 @Module({
   imports: [IdGeneratorModule, LoggerModule, SecurityModule, UsersModule],
@@ -20,6 +22,8 @@ import { RemoveMemberFromProjectUseCase } from '../application/remove-member-fro
     CreateProjectUseCase,
     AssignMemberToProjectUseCase,
     RemoveMemberFromProjectUseCase,
+    ListProjectsUseCase,
+    GetProjectByIdUseCase,
     {
       provide: PROJECT_REPOSITORY,
       useClass: PrismaProjectRepository,

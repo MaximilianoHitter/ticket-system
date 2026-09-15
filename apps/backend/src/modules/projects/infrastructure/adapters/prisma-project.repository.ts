@@ -29,4 +29,25 @@ export class PrismaProjectRepository implements ProjectRepositoryInterface {
     });
     return ProjectMapper.toDomain(record);
   }
+
+  async findAll(
+    skip: number,
+    take: number,
+    memberUserId?: string,
+  ): Promise<{ projects: Project[]; total: number }> {
+    const where = {
+      deletedAt: null,
+      ...(memberUserId ? { members: { some: { userId: memberUserId } } } : {}),
+    };
+
+    const [records, total] = await this.prisma.$transaction([
+      this.prisma.projectModel.findMany({ where, skip, take }),
+      this.prisma.projectModel.count({ where }),
+    ]);
+
+    return {
+      projects: records.map(ProjectMapper.toDomain),
+      total,
+    };
+  }
 }
