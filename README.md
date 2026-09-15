@@ -143,7 +143,7 @@ El seguimiento de tareas y fases del proyecto se lleva en el [GitHub Project](ht
 - ✅ Fase 0 — Infraestructura del monorepo
 - ✅ Fase 1 — Backend base + Autenticación (JWT)
 - ✅ Fase 2 — Gestión de usuarios
-- ⬜ Fase 3 — Proyectos
+- ✅ Fase 3 — Proyectos
 - ⬜ Fase 4 — Tickets
 - ⬜ Fase 5 — Frontend base + Auth
 - ⬜ Fase 6 — Frontend: proyectos y tickets
