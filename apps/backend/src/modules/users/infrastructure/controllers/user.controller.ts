@@ -1,14 +1,11 @@
 import { CreateUserUseCase } from '@modules/users/application/create-user.use-case';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -41,6 +38,7 @@ import { GetMeUseCase } from '@modules/users/application/get-me.use-case';
 import { EditUserRequestDto } from '../dto/request/edit-user.request.dto';
 import { EditUserUseCase } from '@modules/users/application/edit-user.use-case';
 import { DeactivateUserUseCase } from '@modules/users/application/deactivate-user.use-case';
+import { UuidParam } from '@shared/validation/infrastructure/uuid-param.decorator';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -101,13 +99,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Obtener un usuario por id' })
   @ApiResponse({ type: () => UserResponseDto })
   async getById(
-    @Param(
-      'id',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('id', 'El id del usuario debe ser un UUID válido')
     id: string,
   ): Promise<UserResponseDto> {
     const output = await this.getUserByIdUseCase.execute({ id: id });
@@ -120,13 +112,7 @@ export class UsersController {
   @ApiBody({ type: () => EditUserRequestDto })
   @ApiResponse({ type: () => UserResponseDto })
   async edit(
-    @Param(
-      'id',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('id', 'El id del usuario debe ser un UUID válido')
     id: string,
     @CurrentUser() currentUser: TokenPayload,
     @Body() dto: EditUserRequestDto,
@@ -147,13 +133,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Desactivar un usuario' })
   @ApiResponse({ type: () => UserResponseDto })
   async deactivate(
-    @Param(
-      'id',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('id', 'El id del usuario debe ser un UUID válido')
     id: string,
     @CurrentUser() currentUser: TokenPayload,
   ) {

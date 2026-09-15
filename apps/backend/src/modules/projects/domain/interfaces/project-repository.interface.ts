@@ -11,4 +11,9 @@ export interface CreateProjectData {
 export interface ProjectRepositoryInterface {
   findById(id: string): Promise<Project | null>;
   create(id: string, data: CreateProjectData): Promise<Project>;
+  findAll(
+    skip: number,
+    take: number,
+    memberUserId?: string,
+  ): Promise<{ projects: Project[]; total: number }>;
 }

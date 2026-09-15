@@ -1,5 +1,5 @@
 // shared/filters/domain-exception.filter.ts
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { DomainError } from '@shared/domain/exceptions/domain-error';
 import { Response } from 'express';
 
@@ -9,12 +9,23 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const status =
-      exception instanceof DomainError ? exception.statusCode : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status: HttpStatus;
+    let message: string;
+
+    if (exception instanceof DomainError) {
+      status = exception.statusCode;
+      message = exception.message;
+    } else if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      message = exception.message;
+    } else {
+      status = HttpStatus.INTERNAL_SERVER_ERROR;
+      message = exception.message;
+    }
 
     response.status(status).json({
       statusCode: status,
-      message: exception.message,
+      message,
     });
   }
 }

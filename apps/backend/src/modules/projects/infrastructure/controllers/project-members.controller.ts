@@ -1,15 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiCreatedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@shared/security/infrastructure/jwt-auth.guard';
 import { RolesGuard } from '@shared/security/infrastructure/roles.guard';
@@ -19,6 +8,7 @@ import { AssignMemberToProjectUseCase } from '../../application/assign-member-to
 import { AssignMemberRequestDto } from '../dto/request/assign-member.request.dto';
 import { ProjectMemberResponseDto } from '../dto/response/project-member.response.dto';
 import { RemoveMemberFromProjectUseCase } from '@modules/projects/application/remove-member-from-project.use-case';
+import { UuidParam } from '@shared/validation/infrastructure/uuid-param.decorator';
 
 @ApiTags('project-members')
 @ApiBearerAuth('token')
@@ -36,13 +26,7 @@ export class ProjectMembersController {
   @ApiOperation({ summary: 'Asignar un usuario (Gestor o Cliente) a un proyecto (solo Admin)' })
   @ApiCreatedResponse({ type: ProjectMemberResponseDto })
   async assign(
-    @Param(
-      'projectId',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('projectId', 'El id del proyecto debe ser un UUID válido')
     projectId: string,
     @Body() dto: AssignMemberRequestDto,
   ): Promise<ProjectMemberResponseDto> {
@@ -58,21 +42,9 @@ export class ProjectMembersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Desasignar un usuario de un proyecto (solo Admin)' })
   async remove(
-    @Param(
-      'projectId',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('projectId', 'El id del proyecto debe ser un UUID válido')
     projectId: string,
-    @Param(
-      'userId',
-      new ParseUUIDPipe({
-        version: '4',
-        exceptionFactory: (_errors) => new BadRequestException('El Id debe ser un UUID válido'),
-      }),
-    )
+    @UuidParam('userId', 'El id del usuario debe ser un UUID válido')
     userId: string,
   ): Promise<void> {
     await this.removeMemberFromProjectUseCase.execute({ projectId, userId });
