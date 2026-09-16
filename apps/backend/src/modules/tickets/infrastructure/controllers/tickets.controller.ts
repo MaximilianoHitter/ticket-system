@@ -18,6 +18,8 @@ import { Role } from '@ticketapp/shared-types';
 import { UuidParam } from '@shared/validation/infrastructure/uuid-param.decorator';
 import { AssignTicketUseCase } from '@modules/tickets/application/assign-ticket.use-case';
 import { AssignTicketRequestDto } from '../dto/request/assign-ticket.request.dto';
+import { ChangeTicketStatusRequestDto } from '../dto/request/change-ticket-status.request.dto';
+import { ChangeTicketStatusUseCase } from '@modules/tickets/application/change-ticket-status.use-case';
 
 @ApiTags('tickets')
 @ApiBearerAuth('token')
@@ -27,6 +29,7 @@ export class TicketsController {
   constructor(
     private readonly createTicketUseCase: CreateTicketUseCase,
     private readonly assignTicketUseCase: AssignTicketUseCase,
+    private readonly changeTicketStatusUseCase: ChangeTicketStatusUseCase,
   ) {}
 
   @Post()
@@ -58,6 +61,22 @@ export class TicketsController {
     const output = await this.assignTicketUseCase.execute({
       ticketId: id,
       assigneeId: dto.assigneeId,
+      requestingUser: currentUser,
+    });
+    return TicketResponseDto.fromEntity(output.ticket);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Cambiar el estado de un ticket (según reglas de transición por rol)' })
+  @ApiOkResponse({ type: TicketResponseDto })
+  async changeStatus(
+    @UuidParam('id', 'El id del ticket debe ser un UUID válido') id: string,
+    @Body() dto: ChangeTicketStatusRequestDto,
+    @CurrentUser() currentUser: TokenPayload,
+  ): Promise<TicketResponseDto> {
+    const output = await this.changeTicketStatusUseCase.execute({
+      ticketId: id,
+      targetStatus: dto.status,
       requestingUser: currentUser,
     });
     return TicketResponseDto.fromEntity(output.ticket);
