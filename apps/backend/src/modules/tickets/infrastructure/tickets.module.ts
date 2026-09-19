@@ -17,6 +17,7 @@ import { BlockTicketHandler } from '../application/handlers/block-ticket.handler
 import { UnblockTicketHandler } from '../application/handlers/unblock-ticket.handler';
 import { CloseTicketHandler } from '../application/handlers/close-ticket.handler';
 import { AdminOverrideTicketHandler } from '../application/handlers/admin-override-ticket.handler';
+import { ListTicketsUseCase } from '../application/list-tickets.use-case';
 
 @Module({
   imports: [IdGeneratorModule, SecurityModule, ProjectsModule, UsersModule],
@@ -31,6 +32,7 @@ import { AdminOverrideTicketHandler } from '../application/handlers/admin-overri
     UnblockTicketHandler,
     CloseTicketHandler,
     AdminOverrideTicketHandler,
+    ListTicketsUseCase,
     {
       provide: TICKET_REPOSITORY,
       useClass: PrismaTicketRepository,

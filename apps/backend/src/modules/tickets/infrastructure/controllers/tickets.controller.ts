@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,6 +20,12 @@ import { AssignTicketUseCase } from '@modules/tickets/application/assign-ticket.
 import { AssignTicketRequestDto } from '../dto/request/assign-ticket.request.dto';
 import { ChangeTicketStatusRequestDto } from '../dto/request/change-ticket-status.request.dto';
 import { ChangeTicketStatusUseCase } from '@modules/tickets/application/change-ticket-status.use-case';
+import {
+  ApiPaginatedResponse,
+  PaginatedResponseDto,
+} from '@shared/dto/response/paginated.response.dto';
+import { ListTicketsRequestDto } from '../dto/request/list-tickets.request.dto';
+import { ListTicketsUseCase } from '@modules/tickets/application/list-tickets.use-case';
 
 @ApiTags('tickets')
 @ApiBearerAuth('token')
@@ -30,6 +36,7 @@ export class TicketsController {
     private readonly createTicketUseCase: CreateTicketUseCase,
     private readonly assignTicketUseCase: AssignTicketUseCase,
     private readonly changeTicketStatusUseCase: ChangeTicketStatusUseCase,
+    private readonly listTicketsUseCase: ListTicketsUseCase,
   ) {}
 
   @Post()
@@ -80,5 +87,26 @@ export class TicketsController {
       requestingUser: currentUser,
     });
     return TicketResponseDto.fromEntity(output.ticket);
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Listar tickets (Admin ve todos, Cliente y Gestor los de sus proyectos)',
+  })
+  @ApiOkResponse({ type: ApiPaginatedResponse(TicketResponseDto) })
+  async list(
+    @Query() dto: ListTicketsRequestDto,
+    @CurrentUser() currentUser: TokenPayload,
+  ): Promise<PaginatedResponseDto<TicketResponseDto>> {
+    const output = await this.listTicketsUseCase.execute({
+      skip: dto.getSkip(),
+      take: dto.getTake(),
+      projectId: dto.projectId,
+      requestingUser: currentUser,
+    });
+
+    const ticketsDto = output.tickets.map((ticket) => TicketResponseDto.fromEntity(ticket));
+
+    return new PaginatedResponseDto(ticketsDto, output.total, dto.page, dto.limit);
   }
 }
