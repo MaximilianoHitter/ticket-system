@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@shared/prisma/prisma.service';
 import {
   CreateTicketData,
+  ListTicketsFilter,
   TicketRepositoryInterface,
 } from '../../domain/interfaces/ticket-repository.interface';
 import { Ticket } from '../../domain/entities/ticket.entity';
@@ -48,5 +49,29 @@ export class PrismaTicketRepository implements TicketRepositoryInterface {
       },
     });
     return TicketMapper.toDomain(record);
+  }
+
+  async findAll(
+    skip: number,
+    take: number,
+    filter: ListTicketsFilter,
+  ): Promise<{ tickets: Ticket[]; total: number }> {
+    const where = {
+      ...(filter.projectId ? { projectId: filter.projectId } : {}),
+      ...(filter.createdBy ? { createdBy: filter.createdBy } : {}),
+      ...(filter.memberOfProjectUserId
+        ? { project: { members: { some: { userId: filter.memberOfProjectUserId } } } }
+        : {}),
+    };
+
+    const [records, total] = await this.prisma.$transaction([
+      this.prisma.ticketModel.findMany({ where, skip, take }),
+      this.prisma.ticketModel.count({ where }),
+    ]);
+
+    return {
+      tickets: records.map(TicketMapper.toDomain),
+      total,
+    };
   }
 }

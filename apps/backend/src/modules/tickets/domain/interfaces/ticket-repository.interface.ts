@@ -10,9 +10,20 @@ export interface CreateTicketData {
   createdBy: string;
 }
 
+export interface ListTicketsFilter {
+  projectId?: string;
+  createdBy?: string;
+  memberOfProjectUserId?: string;
+}
+
 export interface TicketRepositoryInterface {
   findById(id: string): Promise<Ticket | null>;
   create(id: string, data: CreateTicketData): Promise<Ticket>;
   updateAssignee(id: string, assignedTo: string): Promise<Ticket>;
   updateStatus(id: string, status: TicketStatus, resolvedAt?: Date | null): Promise<Ticket>;
+  findAll(
+    skip: number,
+    take: number,
+    filter: ListTicketsFilter,
+  ): Promise<{ tickets: Ticket[]; total: number }>;
 }
